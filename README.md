@@ -1,11 +1,14 @@
 # VAE-GMVAE
-This repository contains the implementation of the VAE and Gaussian Mixture VAE using TensorFlow. The VAE implementation  is completeley based on the model described in [link](https://arxiv.org/pdf/1606.05908.pdf) and the GMVAE implementation is based on the model presented in [link](https://arxiv.org/pdf/1611.02648.pdf) with some modifications. These modifications are described in the Chapter 4 of this bachelor thesis (not available yet).
+This repository contains the implementation of the VAE and Gaussian Mixture VAE using TensorFlow. The VAE implementation  is completeley based on the model described in [link](https://arxiv.org/pdf/1606.05908.pdf) and the GMVAE implementation is based on the model presented in [link](https://arxiv.org/pdf/1611.02648.pdf) with some modifications in the optimization function and the implementation of some distributions. These modifications are described in the Chapter 4 of this bachelor thesis (not available yet).
   
 ## Dependencies
 1. Install [Tensorflow](https://www.tensorflow.org/get_started/os_setup)
 2. Install [Matplotlib](https://matplotlib.org/index.html)
 3. Install [Numpy](http://www.numpy.org/)
 
+## Graphical model
+![VAE Graphical Model](imgs/VAE_graphical_model.png)
+![GMVAE Graphical Model](imgs/GMVAE_graphical_model.png)
 ## Hyperparameters
 The following hyperparameters are defined. Some of them handle the files
 generated, others deal with saving and restoring a model and others determine certain aspects
