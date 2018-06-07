@@ -1,5 +1,5 @@
 # VAE-GMVAE
-This repository contains the implementation of the VAE and Gaussian Mixture VAE using TensorFlow
+This repository contains the implementation of the VAE and Gaussian Mixture VAE using TensorFlow. The VAE implementation  is completeley based on the model described in [link](https://arxiv.org/pdf/1606.05908.pdf) and the GMVAE implementation is based on the model presented in [link](https://arxiv.org/pdf/1611.02648.pdf) with some modifications. These modifications are described in the Chapter 4 of this bachelor thesis (not available yet).
   
 ## Dependencies
 1. Install [Tensorflow](https://www.tensorflow.org/get_started/os_setup)
@@ -48,7 +48,17 @@ Other parameters:
   --num_imgs NUM_IMGS               Images to plot
   --extra_name EXTRA_NAME           Extra name to identify the model
 ```
+## Model selection
+The selection of a model is done through the model_name parameter. It can take the following values:
+
+-model1: VAE implemented using dense neural networks.
+-model2: VAE implemented using CNNs
+-model3: GMVAE (instability issues)
+-model4_bias: GMVAE implemented using dense neural networks
+-model5: GMVAE implemented using CNNs.
+
 ## Examples of use
+
 ## Results
 
 ## Acknowledgments
