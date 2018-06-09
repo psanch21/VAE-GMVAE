@@ -63,14 +63,54 @@ Other parameters:
   --num_imgs NUM_IMGS               Images to plot
   --extra_name EXTRA_NAME           Extra name to identify the model
 ```
-## Model selection
-The selection of a model is done through the model_name parameter. It can take the following values:
+## Architecture selection
+The selection of an architecture is done through the model_name parameter. It can take the following values:
 
 - model1: VAE implemented using dense neural networks. [VAE.py]
 - model2: VAE implemented using CNNs. [VAE.py]
 - model3: GMVAE test with only one latent variable (instability issues). [VAE.py]
 - model4_bias: GMVAE implemented using dense neural networks [GMVAE.py]
 - model5: GMVAE implemented using CNNs. [GMVAE.py]
+
+## Saved models
+
+Models are saved following the following naming. For the VAE it has 7 fields:
+
+```
+{model_name}_{dataset_name}_{epochs}_{sigma}_{dim_Z}_{hidden_dim}_{num_layers}
+```
+
+For the GMVAE it has the previous field plus "dim_Z" and "K_clusters", which makes 9 in total:
+
+```
+{model_name}_{dataset_name}_{epochs}_{sigma}_{dim_Z}_{dim_W}_{hidden_dim}_{num_layers}_{K_clusters}
+```
+
+Example: model5_MNIST_300_001_10_2_128_3_10
+## TensorBoard
+It is possible to visualize the evolution of parameters during training and the latent variables in TensorBoard. It can be done executing the tensorboard command indicating the log folder of the trained model:
+
+```
+tensorboard--logdir=LOGDIR/MODEL_SAVED/
+```
+
+For example, if the following model's configuration is trained:
+```
+python3 GMVAE.py --epochs=300 --sigma=0.001 --z_dim=10 --w_dim=2 --hidden_dim=128 --num_layers=3 --K_clusters=10 --num_imgs=300 --learning_rate=1e-3 --dataset_name=MNIST --model_name=model5 --train=1 --restore=0 --plot=0 --generate=1
+```
+then it is possible to open TensorBoard and see the parameters of the previous model:
+```
+tensorboard --logdir=./tensorflow/logdir/model5_MNIST_300_0001_10_2_128_3_10/
+```
+Tensorflow will be opened in a browser and you will see 5 tabs: SCALARS, GRAPHS, DISTRIBUTIONS, HISTOGRAMS AND PROJECTO. The two screenshots below show the PROJECTOR tab, which shows several inputs images projected in the latent space through t-SNE.
+
+<p align="center">
+<img width="700" src="imgs/tensorboard_3d.png">
+</p>
+
+<p align="center">
+<img width="700" src="imgs/tensorboard_2d.png">
+</p>
 
 ## Examples of use
 Training and generation of model1 using MNIST dataset:
