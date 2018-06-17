@@ -6,7 +6,7 @@ This repository contains the implementation of the VAE and Gaussian Mixture VAE 
 2. Install [Matplotlib](https://matplotlib.org/index.html)
 3. Install [Numpy](http://www.numpy.org/)
 
-## Graphical model
+## Graphical Model
 
 The image below shows the graphical model for the VAE.The variable x represents the input data and the variable z represents the latent space. The left part is the generative model and the right part is the inference model.
 
@@ -17,6 +17,22 @@ The image below shows the graphical model for the GMVAE.The variable x represent
 
 <p align="center">
 <img width="460" src="imgs/GMVAE_graphical_model.png">
+</p>
+
+For a complete explanation of both models see Chapter 3 and Chapter 4 of the bachelor thesis (soon available).
+
+## Objective Function
+
+These are the functions that are optimized during training. It can be observed both contains a term that will be maximized (blue) and one or more terms that are regularizers (red).
+
+For the VAE:
+<p align="center">
+<img width="460" src="imgs/elbo_VAE.png">
+</p>
+
+For the GMVAE:
+<p align="center">
+<img width="460" src="imgs/elbo_GMVAE.png">
 </p>
 
 For a complete explanation of both models see Chapter 3 and Chapter 4 of the bachelor thesis (soon available).
