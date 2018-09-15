@@ -117,7 +117,7 @@ class VAEGraph(BaseGraph):
                             num_layers=2, 
                             transfer_fct=self.transfer_fct,
                             act_out=tf.nn.sigmoid, 
-                            reuse=self.reuse, 
+                            reuse=True, 
                             kinit=self.kinit,
                             bias_init=self.bias_init,
                             drop_rate=self.drop_rate)

@@ -40,7 +40,7 @@ def parser_basic():
 
 
     parser.add_argument('--model_type', type=int, default=0, help='Fixes the model and architecture')
-    parser.add_argument('--extra_name', type=str, default='Extra name to identify the model')
+    parser.add_argument('--extra', type=str, default='', help='Extra name to identify the model')
 
     # TODO: Que pasa con esto?
     parser.add_argument('--max_mean', type=int, default=10)
@@ -103,6 +103,9 @@ def process_args(args,model):
                         str(config.z_dim) + '_'+ \
                         str(config.hidden_dim)  + '_'+\
                         str(config.num_layers)
+    
+    if(config.extra is not ''):
+        config.model_name += '_' + config.extra
     config.summary_dir = os.path.join("experiments/summary/", config.model_name)
     config.checkpoint_dir = os.path.join("experiments/checkpoint/", config.model_name)
     config.results_dir = os.path.join("experiments/results/", config.model_name)
