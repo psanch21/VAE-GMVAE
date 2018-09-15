@@ -8,8 +8,8 @@ class Dataset:
         self._labels = labels
         
         self._ndata = data.shape[0]
-        self.height = data.shape[1]
-        self.width = data.shape[2]
+        self.height = data.shape[2]
+        self.width = data.shape[1]
         self.num_channels = data.shape[3]
         self._idx_batch = 0
         self._idx_vector = np.array(range(self._ndata))
