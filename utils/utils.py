@@ -19,9 +19,157 @@ import tensorflow as tf
 
 from tensorflow.examples.tutorials.mnist import input_data
 
-from aux.dataset import Dataset
+from utils.dataset import Dataset
 
 from scipy.io import loadmat
+'''  ------------------------------------------------------------------------------
+                                    DATA METHODS
+ ------------------------------------------------------------------------------ '''
+
+def get_data(data_file):
+    data_path = '../data/'
+    if(data_file == 'MNIST'):
+        data_path +='MNIST_data'
+    if(data_file == 'FREY'):
+        data_path +='frey_rawface.mat'
+    if(data_file == 'CIFAR10'):
+        data_path +='MNIST_data'
+    return 
+
+def load_data(dataset_name):
+    flat = False
+
+    if(dataset_name == 'MNIST'):
+        return load_MNIST()
+    elif(dataset_name == 'FREY'):
+        return load_FREY()
+
+    return None
+
+def load_FREY():
+    data_path = '../data/frey_rawface.mat'
+    mat = loadmat(data_path)
+    data = mat['ff']
+    data = np.transpose(data) # [num_images, dimension]
+    data = np.array(data, dtype=np.float32)
+    for i in range(data.shape[0]):
+        min_value = np.min(data[i,:])
+        max_value = np.max(data[i,:])
+        num = (data[i,:] - min_value)
+        den = (max_value - min_value)
+        data[i,:] = num/den
+
+    data_dim = data.shape[1]
+    num_images = data.shape[0]
+    train_size = int(num_images*0.8)
+    valid_size = int(num_images*0.1)
+    test_size = num_images - train_size - valid_size
+
+    x_train = data[:train_size]
+    x_valid = data[train_size:(train_size+valid_size)]
+    x_test = data[(train_size+valid_size):]
+
+    x_train = np.reshape(x_train, [-1, 28, 20, 1])
+    x_valid = np.reshape(x_valid, [-1, 28, 20, 1])
+    x_test = np.reshape(x_test, [-1, 28, 20, 1])
+
+    x_train_labels = np.zeros(x_train.shape[0])
+    x_valid_labels = np.zeros(x_valid.shape[0])
+    x_test_labels = np.zeros(x_test.shape[0])
+
+    train_dataset = Dataset(x_train, x_train_labels)
+    valid_dataset = Dataset(x_valid, x_valid_labels)
+    test_dataset = Dataset(x_test, x_test_labels)
+
+    print('Train Data: ', train_dataset.x.shape)
+    print('Valid Data: ', valid_dataset.x.shape)
+    print('Test Data: ', test_dataset.x.shape)
+
+    return train_dataset, valid_dataset, test_dataset
+
+
+def load_MNIST():
+    data_path = '../data/MNIST_data'
+    data = input_data.read_data_sets(data_path, one_hot=False)
+    x_train_aux = data.train.images
+    x_test = data.test.images
+    data_dim = data.train.images.shape[1]
+    n_train = data.train.images.shape[0]
+
+    train_size = int(n_train * 0.8)
+    valid_size = n_train - train_size
+    x_valid, x_train = merge_datasets(x_train_aux, data_dim, train_size, valid_size)
+    print('Data loaded. ', time.localtime().tm_hour,
+          ':', time.localtime().tm_min, 'h')
+    # logs.write('\tData loaded ' + str(time.localtime().tm_hour) +':' + str(time.localtime().tm_min) + 'h\n')
+
+    x_train = np.reshape(x_train, [-1, 28, 28, 1])
+    x_valid = np.reshape(x_valid, [-1, 28, 28, 1])
+    x_test = np.reshape(x_test, [-1, 28, 28, 1])
+
+
+    train_dataset = Dataset(x_train, data.train.labels)
+    valid_dataset = Dataset(x_valid, data.train.labels)
+    test_dataset = Dataset(x_test, data.test.labels)
+
+    print('Train Data: ', train_dataset.x.shape)
+    print('Valid Data: ', valid_dataset.x.shape)
+    print('Test Data: ', test_dataset.x.shape)
+
+    return train_dataset, valid_dataset, test_dataset
+
+
+
+def merge_datasets(data, data_dim, train_size, valid_size=0):
+    valid_dataset = np.ndarray((valid_size, data_dim), dtype=np.float32)
+    train_dataset = np.ndarray((train_size, data_dim), dtype=np.float32)
+
+    np.random.shuffle(data)
+
+    if valid_dataset is not None:
+        valid_dataset = data[:valid_size, :]
+
+    train_dataset = data[valid_size:, :]
+
+    return valid_dataset, train_dataset
+
+
+
+
+'''  ------------------------------------------------------------------------------
+                                    FILES & DIRS
+ ------------------------------------------------------------------------------ '''
+
+def save_img(fig, model_name, image_name, result_dir):
+    complete_name = result_dir + '/' + model_name + '_' + image_name + '.png'
+    idx = 1
+    while(os.path.exists(complete_name)):
+        complete_name = result_dir + '/' + model_name + '_' + image_name + '_'+str(idx)+'.png'
+        idx+=1
+    fig.savefig(complete_name)
+    
+def save_args(args, summary_dir):
+    my_file = summary_dir + '/' + 'my_args.txt'
+    args_string = str(args).replace(', ', ' --')
+    with open(my_file, 'a+') as file_:
+        file_.write(args_string)
+        
+def create_dirs(dirs):
+    """
+    dirs - a list of directories to create if these directories are not found
+    :param dirs:
+    :return exit_code: 0:success -1:failed
+    """
+    try:
+        for dir_ in dirs:
+            if not os.path.exists(dir_):
+                os.makedirs(dir_)
+        return 0
+    except Exception as err:
+        print("Creating directories error: {0}".format(err))
+        exit(-1)
+  
+    
 
 '''  ------------------------------------------------------------------------------
                                     FOLDER/FILE METHODS
@@ -72,16 +220,6 @@ def write_log_file(filename, args):
 
 
 
-def save_img(fig, image_name, model_name, result_dir):
-
-    if not os.path.exists(result_dir):
-        os.makedirs(result_dir)
-
-    fig.savefig(os.path.join(
-        result_dir, model_name + '_' + image_name + '.png'))
-
-
-
 '''  ------------------------------------------------------------------------------
                                     PRINT METHODS
  ------------------------------------------------------------------------------ '''
@@ -113,165 +251,8 @@ def get_params(args):
     return retval
 
 
-'''  ------------------------------------------------------------------------------
-                                    TENSORFLOW METHODS
- ------------------------------------------------------------------------------ '''
-
-def get_writer(model_dir, tr_val, log_dir):
-    direct = log_dir + '/' + model_dir + '/' + tr_val
-    clean_folder(direct)
-    # clean_folder(log_dir + '/' + model_dir + '/' + tr_val)
-    writer = tf.summary.FileWriter(direct, tf.get_default_graph())
-    return writer, direct
 
 
-def load(sess, saver, model_dir, checkpoint_dir,logs = True):
-
-    checkpoint_dir = os.path.join(checkpoint_dir, model_dir)
-    printt(" \n[*] Restore model: " + model_dir, logs)
-    printt(" [*] Reading checkpoints...", logs)
-
-    check_folder(checkpoint_dir)
-    ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
-    if ckpt and ckpt.model_checkpoint_path:
-        ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
-        saver.restore(sess, os.path.join(
-            checkpoint_dir, ckpt_name))
-        counter = int(next(re.finditer("(\d+)(?!.*\d)", ckpt_name)).group(0))
-
-        printt(" [*] Success to read {}".format(ckpt_name), logs)
-        return True, counter
-    else:
-        printt(" [*] Failed to find a checkpoint", logs)
-        return False, 0
-
-def save(sess, saver, model_dir, checkpoint_dir, step):
-
-    checkpoint_dir = os.path.join(checkpoint_dir, model_dir)
-    # clean_folder(checkpoint_dir)
-
-    saver.save(sess, os.path.join(
-        checkpoint_dir, model_dir + '.model'), global_step=step)
-    return
-
-
-'''  ------------------------------------------------------------------------------
-                                    DATA METHODS
- ------------------------------------------------------------------------------ '''
-
-def load_data(dataset_name, model_name):
-    print('\n Loading data...')
-    flat = False
-
-    if(dataset_name == 'MNIST'):
-        return load_MNIST(flat)
-    elif(dataset_name == 'FREY'):
-        return load_FREY(flat)
-
-    return None
-
-def load_FREY(flat):
-    data_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/aux/'
-    mat = loadmat(data_path + 'frey_rawface.mat')
-    data = mat['ff']
-    data = np.transpose(data) # [num_images, dimension]
-    data = np.array(data, dtype=np.float32)
-    for i in range(data.shape[0]):
-        min_value = np.min(data[i,:])
-        max_value = np.max(data[i,:])
-        num = (data[i,:] - min_value)
-        den = (max_value - min_value)
-        data[i,:] = num/den
-
-    data_dim = data.shape[1]
-    num_images = data.shape[0]
-    train_size = int(num_images*0.8)
-    valid_size = int(num_images*0.1)
-    test_size = num_images - train_size - valid_size
-
-    x_train = data[:train_size]
-    x_valid = data[train_size:(train_size+valid_size)]
-    x_test = data[(train_size+valid_size):]
-
-    x_train = np.reshape(x_train, [-1, 28, 20, 1])
-    x_valid = np.reshape(x_valid, [-1, 28, 20, 1])
-    x_test = np.reshape(x_test, [-1, 28, 20, 1])
-
-    x_train_labels = np.zeros(x_train.shape[0])
-    x_valid_labels = np.zeros(x_valid.shape[0])
-    x_test_labels = np.zeros(x_test.shape[0])
-
-    train_dataset = Dataset(x_train, x_train_labels, flat)
-    valid_dataset = Dataset(x_valid, x_valid_labels, flat)
-    test_dataset = Dataset(x_test, x_test_labels, flat)
-
-    print('Train Data: ', train_dataset.data.shape)
-    print('Valid Data: ', valid_dataset.data.shape)
-    print('Test Data: ', test_dataset.data.shape)
-
-    return train_dataset, valid_dataset, test_dataset, data_dim
-
-
-def load_MNIST(flat):
-    data_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/aux/'
-    data = input_data.read_data_sets(data_path + 'MNIST_data', one_hot=False)
-    x_train_aux = data.train.images
-    x_test = data.test.images
-    data_dim = data.train.images.shape[1]
-    n_train = data.train.images.shape[0]
-
-    train_size = int(n_train * 0.8)
-    valid_size = n_train - train_size
-    x_valid, x_train = merge_datasets(x_train_aux, data_dim, train_size, valid_size)
-    print('Data loaded. ', time.localtime().tm_hour,
-          ':', time.localtime().tm_min, 'h')
-    # logs.write('\tData loaded ' + str(time.localtime().tm_hour) +':' + str(time.localtime().tm_min) + 'h\n')
-
-    x_train = np.reshape(x_train, [-1, 28, 28, 1])
-    x_valid = np.reshape(x_valid, [-1, 28, 28, 1])
-    x_test = np.reshape(x_test, [-1, 28, 28, 1])
-
-
-    train_dataset = Dataset(x_train, data.train.labels, flat)
-    valid_dataset = Dataset(x_valid, data.train.labels, flat)
-    test_dataset = Dataset(x_test, data.test.labels, flat)
-
-    print('Train Data: ', train_dataset.data.shape)
-    print('Valid Data: ', valid_dataset.data.shape)
-    print('Test Data: ', test_dataset.data.shape)
-
-    return train_dataset, valid_dataset, test_dataset, data_dim
-
-
-
-def merge_datasets(data, data_dim, train_size, valid_size=0):
-    valid_dataset = np.ndarray((valid_size, data_dim), dtype=np.float32)
-    train_dataset = np.ndarray((train_size, data_dim), dtype=np.float32)
-
-    np.random.shuffle(data)
-
-    if valid_dataset is not None:
-        valid_dataset = data[:valid_size, :]
-
-    train_dataset = data[valid_size:, :]
-
-    return valid_dataset, train_dataset
-
-
-'''  ------------------------------------------------------------------------------
-                                    ACTIVATION METHODS
- ------------------------------------------------------------------------------ '''
-
-def lrelu(x, leak=0.2, name="lrelu"):
-    with tf.variable_scope(name):
-        f1 = 0.5 * (1 + leak)
-        f2 = 0.5 * (1 - leak)
-        return f1 * x + f2 * abs(x)
-
-# We add 0.1 to avoid the variance is smaller
-
-def sigma(tensor):
-    return tf.add(tf.nn.softplus(tensor), 0.1)
 '''  ------------------------------------------------------------------------------
                                     LAYERS METHODS
  ------------------------------------------------------------------------------ '''
@@ -597,22 +578,47 @@ def deconv_network2(input_, output_dim,hidden_dim, num_layers, reuse, rate, out_
 
     return output, h
 
+
 '''  ------------------------------------------------------------------------------
-                                    TENSORBOARD METHODS
+                                    TF METHODS
  ------------------------------------------------------------------------------ '''
-# Attach a lot of summaries to a Tensor
+
+def lrelu(x, leak=0.2, name="lrelu"):
+    with tf.variable_scope(name):
+        f1 = 0.5 * (1 + leak)
+        f2 = 0.5 * (1 - leak)
+        return f1 * x + f2 * abs(x)
+
+
+def get_variable(dim, name, init_value=0.54):
+    out = tf.get_variable(name,
+                           initializer=tf.constant_initializer(init_value),
+                           shape=[1, dim],
+                           trainable=True,
+                           dtype=tf.float32)
+    out = tf.nn.softplus(out)
+    return out
+
 
 
 def variable_summary(var, name='summaries'):
     with tf.name_scope(name):
         mean = tf.reduce_mean(var)
         tf.summary.scalar('mean', mean)
-
+        
         stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
         tf.summary.scalar('stddev', stddev)
-
+        
         # tf.summary.scalar('max', tf.reduce_max(var))
         # tf.summary.scalar('min', tf.reduce_min(var))
-
+        
         tf.summary.histogram('histogram', var)
     return
+
+def softplus_bias(tensor):
+    out = tf.add(tf.nn.softplus(tensor), 0.1)
+    return out
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
