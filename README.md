@@ -45,7 +45,7 @@ of the algorithm.
 Parameters to handle aspects of the training process and the neural networks:
 ```
   --model_type MODEL_TYPE          Fixes the model and architecture
---dataset_name DATASET_NAME       MNIST or FREY
+  --dataset_name DATASET_NAME       MNIST or FREY
   --epochs EPOCHS                   Number of epochs for training
   --batch_size BATCH_SIZE           Number of inputs used for each iteration
   --sigma SIGMA                     Parameter that defines the variance of the output Gaussian distribution
@@ -78,6 +78,20 @@ Other parameters:
 ```
   --extra EXTRA         Extra name to identify the model
 ```
+## Folder Structure
+This project contains the following folders:
+- Alg_*: contains the files needed to implement a certain algorithm. These files are described in the following section
+- base: base classes for Graph, Model and Visualize
+- networks: classes encapsulating the implementation of CNN, dense and RNN networks.
+- utils: diverse files to manage arguments, data and training things (early stopping, logger...)
+
+## Main Files
+In the models implemented we can differentiate 3 main parts: computation graph (ex. VAE_graph.py), training  (ex. VAE_model.py) and visualization  (ex. VAE_visualize.py).
+- XX_graph.py: contains the class that defines the computation graph of the algorithm and methods to obtain specific parameters
+- XX_model.py: contains the class that generates the computation graph, defines the training process and the evaluation of the trained model.
+- XX_visualize.py: contains the class that contains methods to visualize the results.
+- XX_main.py: This is the main file. It manages the arguments, it loads the data and it instantiates the previous objects.
+
 ## Architecture selection
 The selection of an architecture is done through the model_type parameter. It can take the following values:
 
