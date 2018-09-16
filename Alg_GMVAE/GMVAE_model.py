@@ -7,6 +7,7 @@ Created on Tue Sep 11 10:24:14 2018
 """
 from base.base_model import BaseModel
 import tensorflow as tf
+import tensorflow.contrib.slim as slim
 import numpy as np
 from GMVAE_graph import GMVAEGraph
 from GMVAECNN_graph import GMVAECNNGraph
@@ -49,6 +50,8 @@ class GMVAEModel(BaseModel):
 
             self.model_graph.build_graph()
             self.trainable_count = np.sum([np.prod(v.get_shape().as_list()) for v in tf.trainable_variables()])
+            # model_vars = tf.trainable_variables()
+            # slim.model_analyzer.analyze_vars(model_vars, print_info=True)
             
     
     def train_epoch(self, session,logger, data_train, beta=1):

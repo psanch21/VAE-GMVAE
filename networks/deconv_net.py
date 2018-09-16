@@ -66,7 +66,8 @@ class DeconvNet3(DeconvNet):
     def build(self, input_):
         aux_size = self.width//2//2
         aux_size_2 = self.height//2//2
-        out_dense_dim = aux_size*aux_size_2*128
+        initial_n_channels = 64
+        out_dense_dim = aux_size*aux_size_2*initial_n_channels
         hidden_dim = input_.get_shape()[-1].value*3
         
         dense = DenseNet(input_=input_,
@@ -80,7 +81,7 @@ class DeconvNet3(DeconvNet):
                          bias_init=self.bias_init,
                          drop_rate=self.drop_rate)
         x = dense.output
-        x = tf.reshape(x, [-1,aux_size,aux_size_2,128])
+        x = tf.reshape(x, [-1,aux_size,aux_size_2,initial_n_channels])
         x = self.deconv_layer(input_=x, 
                               filters=64, 
                               k_size=4,  #[4, 4]

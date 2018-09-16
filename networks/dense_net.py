@@ -6,8 +6,8 @@ Created on Thu Sep 13 00:32:57 2018
 @author: pablosanchez
 """
 import tensorflow as tf
+import numpy as np
 import utils.constants as const
-
 class DenseNet(object):
     def __init__(self, input_, hidden_dim, output_dim, num_layers, reuse, transfer_fct=tf.nn.relu,
                  act_out=tf.nn.sigmoid, drop_rate=0., kinit=tf.contrib.layers.xavier_initializer(),

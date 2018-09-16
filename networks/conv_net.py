@@ -94,7 +94,7 @@ class ConvNet3(ConvNet):
                             name='conv_2',  
                             act_func=self.transfer_fct)
         x = self.conv_layer(input_=x, 
-                            filters=128, 
+                            filters=64, 
                             k_size=4,  #[4, 4]
                             stride=2, 
                             padding='SAME', 
@@ -147,7 +147,7 @@ class ConvNet3Gauss(ConvNet):
                             name='conv_2',  
                             act_func=self.transfer_fct)
         x = self.conv_layer(input_=x, 
-                            filters=128, 
+                            filters=64, 
                             k_size=4,  #[4, 4]
                             stride=2, 
                             padding='SAME', 
