@@ -30,6 +30,9 @@ plt.close("all")
 # capture the config path from the run arguments
 # then process the json configuration file
 args = get_args()
+if(args.model_type != const.VAE and args.model_type != const.VAECNN):
+    print('Choose a valid model_type!')
+    sys.exit()
 config, flags = get_config_and_flags(args)
 
 # create the experiments dirs
@@ -56,8 +59,8 @@ network_params.hidden_dim =  config.hidden_dim
 network_params.z_dim =  config.z_dim
 network_params.num_layers =  config.num_layers
 
-'''  ------------------------------------------------------------------------------
-                                     MODEL OPERATIONS
+'''  -----------------------------------------------------------------------------
+                        COMPUTATION GRAPH (Build the model)
     ------------------------------------------------------------------------------ '''
 from VAE_model import VAEModel
 vae_model = VAEModel(network_params,sigma=config.sigma, sigma_act=utils.softplus_bias,
@@ -68,6 +71,10 @@ vae_model = VAEModel(network_params,sigma=config.sigma, sigma_act=utils.softplus
                        summary_dir=config.summary_dir, result_dir=config.results_dir, 
                        restore=flags.restore, model_type=config.model_type)
 print('\nNumber of trainable paramters', vae_model.trainable_count)
+
+'''  -----------------------------------------------------------------------------
+                        TRAIN THE MODEL
+    ------------------------------------------------------------------------------ '''
 if(flags.train==1):
     vae_model.train(data_train, data_valid, enable_es=flags.early_stopping)
     

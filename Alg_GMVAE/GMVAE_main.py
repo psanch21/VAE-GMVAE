@@ -23,7 +23,7 @@ plt.close("all")
                                      EXAMPLE OF USE
     ------------------------------------------------------------------------------ '''
 
-# GMVAE_main.py --model_type=0 --dataset_name=MNIST --sigma=0.001 --z_dim=10 --w_dim=10 --K_clusters=10 --hidden_dim=128 --num_layers=2 --epochs=50 --batch_size=128 --beta=1 --drop_prob=0.3 --l_rate=0.05 --train=1 --results=1 --plot=1 --restore=1 --early_stopping=1
+# GMVAE_main.py --model_type=2 --dataset_name=FREY --sigma=0.001 --z_dim=8 --w_dim=2 --K_clusters=8 --hidden_dim=64 --num_layers=2 --epochs=20 --batch_size=32 --beta=1 --drop_prob=0.3 --l_rate=0.01 --train=1 --results=1 --plot=1 --restore=1 --early_stopping=1
 '''  ------------------------------------------------------------------------------
                                      GET ARGUMENTS
     ------------------------------------------------------------------------------ '''
@@ -62,8 +62,8 @@ network_params.w_dim =  config.w_dim
 network_params.K =  config.K_clusters
 network_params.num_layers =  config.num_layers
 
-'''  ------------------------------------------------------------------------------
-                                     MODEL OPERATIONS
+'''  -----------------------------------------------------------------------------
+                        COMPUTATION GRAPH (Build the model)
     ------------------------------------------------------------------------------ '''
 from GMVAE_model import GMVAEModel
 vae_model = GMVAEModel(network_params,sigma=config.sigma, sigma_act=utils.softplus_bias,
@@ -74,6 +74,11 @@ vae_model = GMVAEModel(network_params,sigma=config.sigma, sigma_act=utils.softpl
                        summary_dir=config.summary_dir, result_dir=config.results_dir, 
                        restore=flags.restore, model_type=config.model_type)
 print('\nNumber of trainable paramters', vae_model.trainable_count)
+
+'''  -----------------------------------------------------------------------------
+                        TRAIN THE MODEL
+    ------------------------------------------------------------------------------ '''
+    
 if(flags.train==1):
     vae_model.train(data_train, data_valid, enable_es=flags.early_stopping)
     
