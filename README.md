@@ -1,5 +1,5 @@
 # VAE-GMVAE
-This repository contains the implementation of the VAE and Gaussian Mixture VAE using TensorFlow. The VAE implementation  is completeley based on the model described in [link](https://arxiv.org/pdf/1606.05908.pdf) and the GMVAE implementation is based on the model presented in [link](https://arxiv.org/pdf/1611.02648.pdf) with some modifications in the optimization function and the implementation of some distributions. These modifications are described in the Chapter 4 of this bachelor thesis (not available yet).
+This repository contains the implementation of the VAE and Gaussian Mixture VAE using TensorFlow. The VAE implementation  is completeley based on the model described in [link](https://arxiv.org/pdf/1606.05908.pdf) and the GMVAE implementation is based on the model presented in [link](https://arxiv.org/pdf/1611.02648.pdf) with some modifications in the optimization function and the implementation of some distributions. These modifications are described in the Chapter 4 of this bachelor thesis (soon available).
 
 ## Dependencies
 1. Install [Tensorflow](https://www.tensorflow.org/get_started/os_setup)
@@ -44,7 +44,7 @@ of the algorithm.
 
 Parameters to handle aspects of the training process and the neural networks:
 ```
-  --model_name MODEL_NAME           Fixes the model and architecture
+  --model_type MODEL_TYPE          Fixes the model and architecture
 --dataset_name DATASET_NAME       MNIST or FREY
   --epochs EPOCHS                   Number of epochs for training
   --batch_size BATCH_SIZE           Number of inputs used for each iteration
@@ -71,38 +71,36 @@ Parameters used to enable/disable training, tensorboard summay, model load, plot
   --summary SUMMARY                 Flag to set TensorBoard summary
   --restore RESTORE                 Flag to restore model
   --plot PLOT                       Flag to set plot
-  --generate GENERATE               Flag to set generation
+  --results RESULTS                 Flag to get results
+  --early_stopping EARLY_STOPPING   Flag to enable early stopping
 ```
 Other parameters:
 ```
-  --save_step SAVE_STEP             Save network each X epochs
-  --num_imgs NUM_IMGS               Images to plot
-  --extra_name EXTRA_NAME           Extra name to identify the model
+  --extra EXTRA         Extra name to identify the model
 ```
 ## Architecture selection
-The selection of an architecture is done through the model_name parameter. It can take the following values:
+The selection of an architecture is done through the model_type parameter. It can take the following values:
 
-- model1: VAE implemented using dense neural networks. [VAE.py]
-- model2: VAE implemented using CNNs. [VAE.py]
-- model3: GMVAE test with only one latent variable (instability issues). [VAE.py]
-- model4_bias: GMVAE implemented using dense neural networks [GMVAE.py]
-- model5: GMVAE implemented using CNNs. [GMVAE.py]
+- 0: VAE implemented using dense neural networks. [VAE_graph.py]
+- 1: VAE implemented using CNNs. [VAECNN_graph.py]
+- 2: GMVAE implemented using dense neural networks [GMVAE_graph.py]
+- 3: GMVAE implemented using CNNs. [GMVAECNN_graph.py]
 
 ## Saved models
 
 Models are saved following the following naming. For the VAE it has 7 fields:
 
 ```
-{model_name}_{dataset_name}_{epochs}_{sigma}_{dim_Z}_{hidden_dim}_{num_layers}
+{model_type}_{dataset_name}_{sigma}_{dim_Z}_{hidden_dim}_{num_layers}
 ```
 
 For the GMVAE it has the previous field plus "dim_Z" and "K_clusters", which makes 9 in total:
 
 ```
-{model_name}_{dataset_name}_{epochs}_{sigma}_{dim_Z}_{dim_W}_{hidden_dim}_{num_layers}_{K_clusters}
+{model_type}_{dataset_name}_{sigma}_{dim_Z}_{dim_W}_{hidden_dim}_{num_layers}_{K_clusters}
 ```
 
-Example: model5_MNIST_300_001_10_2_128_3_10
+Example: V_MNIST_0001_8_64_2
 ## TensorBoard
 It is possible to visualize the evolution of parameters during training and the latent variables in TensorBoard. It can be done executing the tensorboard command indicating the log folder of the trained model:
 
@@ -112,13 +110,13 @@ tensorboard--logdir=LOGDIR/MODEL_SAVED/
 
 For example, if the following model's configuration is trained:
 ```
-python3 GMVAE.py --epochs=300 --sigma=0.001 --z_dim=10 --w_dim=2 --hidden_dim=128 --num_layers=3 --K_clusters=10 --num_imgs=300 --learning_rate=1e-3 --dataset_name=MNIST --model_name=model5 --train=1 --restore=0 --plot=0 --generate=1
+python3 VAE_main.py --model_type=0 --dataset_name=MNIST --sigma=0.001 --z_dim=8 --hidden_dim=64 --num_layers=2 --epochs=20 --batch_size=32 --drop_prob=0.3 --l_rate=0.01 --train=1 --results=1 --plot=1 --restore=1 --early_stopping=1
 ```
 then it is possible to open TensorBoard and see the parameters of the previous model:
 ```
-tensorboard --logdir=./tensorflow/logdir/model5_MNIST_300_0001_10_2_128_3_10/
+tensorboard --logdir=./expeiments/summary/V_MNIST_0001_8_64_2/
 ```
-Tensorflow will be opened in a browser and you will see 5 tabs: SCALARS, GRAPHS, DISTRIBUTIONS, HISTOGRAMS AND PROJECTO. The two screenshots below show the PROJECTOR tab, which shows several inputs images projected in the latent space through t-SNE.
+Tensorflow will be opened in a browser and you will see 5 tabs: SCALARS, GRAPHS, DISTRIBUTIONS, HISTOGRAMS AND PROJECTOR. The two screenshots below show the PROJECTOR tab, which shows several inputs images projected in the latent space through t-SNE.
 
 <p align="center">
 <img width="700" src="imgs/tensorboard_3d.png">
@@ -129,19 +127,20 @@ Tensorflow will be opened in a browser and you will see 5 tabs: SCALARS, GRAPHS,
 </p>
 
 ## Examples of use
-Training and generation of model1 using MNIST dataset:
+Training and results of VAE using MNIST dataset:
 
 ```
-python3 VAE.py --epochs=300 --z_dim=10 --hidden_dim=64 --num_layers=3 --sigma=0.001 --num_imgs=300 --model_name=model1 --dataset_name=MNIST --train=1 --restore=0 --plot=0 --generate=1
+python3 VAE_main.py --model_type=0 --dataset_name=MNIST --sigma=0.001 --z_dim=8 --hidden_dim=64 --num_layers=2 --epochs=20 --batch_size=32 --drop_prob=0.3 --l_rate=0.01 --train=1 --results=1 --plot=1 --restore=1 --early_stopping=1
+
 ```
 
-Load previously trained model5 using FREY dataset, generate results and plot them:
+Load previously trained GMVAECNN using FREY dataset, generate results and plot them:
 ```
-python3 GMVAE.py --epochs=300 --sigma=0.001 --z_dim=10 --w_dim=2 --hidden_dim=64 --num_layers=3 --K_clusters=10 --num_imgs=300 --learning_rate=1e-3 --dataset_name=FREY --model_name=model5 --train=1 --restore=0 --plot=0 --generate=1
+python3 GMVAE_main.py --model_type=3 --dataset_name=FREY --sigma=0.001 --z_dim=8 --w_dim=2 --K_clusters=8 --hidden_dim=64 --num_layers=2 --epochs=20 --batch_size=32 --drop_prob=0.3 --l_rate=0.01 --train=0 --results=1 --plot=1 --restore=1 --early_stopping=1
 ```
 ## Results
 In the title of the generated images "Images generated by GMVAE X" the "X" refers to the cluster index, not to the actual class.
-### model1
+### VAE
 Good generative result:
 <p align="center">
 <img width="700" src="imgs/model1_results_gen.png">
@@ -152,19 +151,19 @@ Good clustering result:
 <img width="700" src="imgs/model1_results_clu.png">
 </p>
 
-### model2
+### VAECNN
 <p align="center">
 <img width="700" src="imgs/model2_results.png">
 </p>
 
 
-### model4_bias
+### GMVAE
 <p align="center">
 <img width="700" src="imgs/model4_bias_results.png">
 </p>
 
 
-### model5
+### GMVAECNN
 Using MNIST dataset:
 <p align="center">
 <img width="700" src="imgs/model5_MNIST.png">
