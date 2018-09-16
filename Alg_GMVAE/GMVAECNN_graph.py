@@ -1,4 +1,4 @@
-from VAE_graph import VAEGraph
+from GMVAE_graph import GMVAEGraph
 import tensorflow as tf
 import numpy as np
 
@@ -9,7 +9,7 @@ from networks.deconv_net import DeconvNet3
 '''
 This is the Main TVAEGraph. Childs of this class are modifications.
 '''
-class VAECNNGraph(VAEGraph):
+class GMVAECNNGraph(GMVAEGraph):
     def __init__(self, network_params,sigma=0.001, sigma_act=tf.nn.softplus,
                  transfer_fct= tf.nn.relu,learning_rate=0.002,
                  kinit=tf.contrib.layers.xavier_initializer(),batch_size=32,
@@ -23,10 +23,10 @@ class VAECNNGraph(VAEGraph):
 
     def build_graph(self):
         self.create_inputs()
-        self.create_graph()
+        self.create_TVAE()
         self.create_loss_optimizer()
     
-    def create_graph(self):
+    def create_TVAE(self):
         print('\n[*] Defining encoder...')
 
         with tf.variable_scope('encoder', reuse=self.reuse):

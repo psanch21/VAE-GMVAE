@@ -24,15 +24,18 @@ class BaseVisualize:
         utils.save_img(fig, self.model_name, name, self.result_dir)
         return
         
-    def scatter_variable(self, var, labels, title, perplexity=10):
-        f, axarr = plt.subplots(1, 1, figsize=self.fig_size)
+    def reduce_dimensionality(self, var, perplexity=10):
         dim = var.shape[-1]
         if(dim>2):
             tsne = TSNE(perplexity=perplexity, n_components=2, init='pca', n_iter=1000)
             var_2d = tsne.fit_transform(var)
         else:
             var_2d = np.asarray(var)
+        return var
         
+    def scatter_variable(self, var, labels, title, perplexity=10):
+        f, axarr = plt.subplots(1, 1, figsize=self.fig_size)
+        var_2d = self.reduce_dimensionality(var)
         for number, color in self.colors.items():
             axarr.scatter(x=var_2d[labels==number, 0], y=var_2d[labels==number, 1], color=color, label=str(number))
     

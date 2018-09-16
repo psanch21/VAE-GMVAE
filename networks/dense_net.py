@@ -23,8 +23,9 @@ class DenseNet(object):
         
         self.kinit= kinit
         self.bias_init = bias_init
-        
-        self.output = self.build(input_)
+        self.output = None
+        if(num_layers >0):
+            self.output = self.build(input_)
 
 
    

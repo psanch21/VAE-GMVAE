@@ -10,16 +10,8 @@ def parser_basic():
     parser = argparse.ArgumentParser(description=desc)
 
     parser.add_argument('--epochs', type=int, default=20,  help='Number of epochs for training')
-    parser.add_argument('--batch_size', type=int, default=64, help='Number of inputs used for each iteration')
-    # reconstrucion variance
-    parser.add_argument('--sigma', type=float, default=0.1, help='Parameter that defines the variance of the output Gaussian distribution')
-    parser.add_argument('--l_rate', type=float, default=1e-3, help='Parameter of the optimization function')
-
-    parser.add_argument('--z_dim', type=int, default=3, help='Dimension of the latent variable z')
-    parser.add_argument('--w_dim', type=int, default=3, help='Dimension of the latent variable w. Only for GMVAE')
-    parser.add_argument('--K_clusters', type=int, default=10, help='Number of modes of the latent variable z. Only for GMVAE')
-    
-    parser.add_argument('--beta', type=float, default=1, help='Beta parameter in the KL')
+    parser.add_argument('--batch_size', type=int, default=64, help='Number of inputs used for each iteration')  
+    parser.add_argument('--l_rate', type=float, default=1e-3, help='Parameter of the optimization function') 
     parser.add_argument('--drop_prob', type=float, default=0, help='Dropout regularizer parameter')
     
     # hidden units in the NNs
@@ -36,19 +28,32 @@ def parser_basic():
     parser.add_argument('--restore', type=int, default=0, help='Flag to restore model')
     parser.add_argument('--plot', type=int, default=0, help='Flag to set plot')
     parser.add_argument('--results', type=int, default=0, help='Flag to get results')
-    parser.add_argument('--early_stopping', type=int, default=1, help='Set to 1 to early_stopping')
+    parser.add_argument('--early_stopping', type=int, default=1, help='Flag to enable early_stopping')
 
 
     parser.add_argument('--model_type', type=int, default=0, help='Fixes the model and architecture')
     parser.add_argument('--extra', type=str, default='', help='Extra name to identify the model')
+    
+    parser = parser_VAE(parser)
+    parser = parser_GMVAE(parser)
+    return parser
+
+def parser_VAE(parser):
+    parser.add_argument('--sigma', type=float, default=0.1, help='Parameter that defines the variance of the output Gaussian distribution')
+    parser.add_argument('--z_dim', type=int, default=3, help='Dimension of the latent variable z')
+    parser.add_argument('--beta', type=float, default=1, help='Beta parameter in the KL')
+    return parser
+    
+def parser_GMVAE(parser):
+    parser.add_argument('--w_dim', type=int, default=3, help='Dimension of the latent variable w. Only for GMVAE')
+    parser.add_argument('--K_clusters', type=int, default=10, help='Number of modes of the latent variable z. Only for GMVAE')
 
     # TODO: Que pasa con esto?
-    parser.add_argument('--max_mean', type=int, default=10)
-    parser.add_argument('--max_var', type=int, default=1)
+    # parser.add_argument('--max_mean', type=int, default=10)
+    # parser.add_argument('--max_var', type=int, default=1)
     # parser.add_argument('--save_file', type=str, default='1-VAE-model-MNIST')
 
     return parser
-
 def check_args(args):
     '''
     This method check the values provided are correct
@@ -97,15 +102,14 @@ def get_config_from_json(json_file):
 def process_args(args,model):
     config = Bunch(args)
     
-    config.model_name = model + '_'+\
-                        config.dataset_name+ '_' + \
-                        str(config.sigma).replace('.', '')+ '_'+\
-                        str(config.z_dim) + '_'+ \
-                        str(config.hidden_dim)  + '_'+\
-                        str(config.num_layers)
+    if(config.model_type==const.VAE or config.model_type==const.VAECNN):
+        config.model_name = get_model_name_VAE(model, config)
+    if(config.model_type==const.GMVAE or config.model_type==const.GMVAECNN):
+        config.model_name = get_model_name_GMVAE(model, config)
     
     if(config.extra is not ''):
         config.model_name += '_' + config.extra
+        
     config.summary_dir = os.path.join("experiments/summary/", config.model_name)
     config.checkpoint_dir = os.path.join("experiments/checkpoint/", config.model_name)
     config.results_dir = os.path.join("experiments/results/", config.model_name)
@@ -119,13 +123,38 @@ def process_args(args,model):
     
     return config, flags
 
+def get_model_name_VAE(model, config):
+    model_name = model + '_'+\
+                 config.dataset_name+ '_' + \
+                 str(config.sigma).replace('.', '')+ '_'+\
+                 str(config.z_dim) + '_'+ \
+                 str(config.hidden_dim)  + '_'+\
+                 str(config.num_layers)
+    return model_name
+
+def get_model_name_GMVAE(model, config):
+    model_name = model + '_'+\
+                 config.dataset_name+ '_' + \
+                 str(config.sigma).replace('.', '')+ '_'+\
+                 str(config.z_dim) + '_'+ \
+                 str(config.w_dim) + '_'+ \
+                 str(config.K_clusters) + '_'+ \
+                 str(config.hidden_dim)  + '_'+\
+                 str(config.num_layers)
+    return model_name
+                        
 def get_config_and_flags(args):
     aux_name = ''
     if(args.model_type==const.VAE):
         aux_name+='V'
     if(args.model_type==const.VAECNN):
         aux_name+='VC'
+    if(args.model_type==const.GMVAE):
+        aux_name+='GMV'
+    if(args.model_type==const.GMVAECNN):
+        aux_name+='GMVC'
 
     # aux_name+= '_'+str(int(args.beta))
     
     return process_args(vars(args), aux_name)  
+

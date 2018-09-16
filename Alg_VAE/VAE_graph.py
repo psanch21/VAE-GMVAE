@@ -39,7 +39,7 @@ class VAEGraph(BaseGraph):
 
     def build_graph(self):
         self.create_inputs()
-        self.create_TVAE()
+        self.create_graph()
         self.create_loss_optimizer()
     
     def create_inputs(self):
@@ -51,7 +51,7 @@ class VAEGraph(BaseGraph):
             self.drop_rate = tf.placeholder(tf.float32,shape=(), name='drop_rate')
         
         
-    def create_TVAE(self):
+    def create_graph(self):
         print('\n[*] Defining encoder...')
 
         with tf.variable_scope('encoder_mean', reuse=self.reuse):
@@ -60,7 +60,7 @@ class VAEGraph(BaseGraph):
                             output_dim=self.z_dim, 
                             num_layers=self.num_layers, 
                             transfer_fct=self.transfer_fct,
-                            act_out=tf.nn.sigmoid, 
+                            act_out=None, 
                             reuse=self.reuse, 
                             kinit=self.kinit,
                             bias_init=self.bias_init,
