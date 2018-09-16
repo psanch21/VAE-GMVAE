@@ -231,12 +231,17 @@ class GMVAEGraph(BaseGraph):
         print('\n[*] Defining sampling...')
         self.w_sample = tf.random_normal((self.batch_size, self.w_dim), 0, 1, dtype=tf.float32)
         self.z_wy_mean_list_sample, self.z_wy_var_list_sample = self.Pz_wy_graph(self.w_sample, True)
-        
+        self.z_sample_list = list()
+        for i in range(self.K):
+            eps = tf.random_normal(tf.shape(self.z_wy_mean_list_sample[i]), 0, 1, dtype=tf.float32)
+            z_sample = tf.add(self.z_wy_mean_list_sample[i], tf.multiply(tf.sqrt(self.z_wy_var_list_sample[i]), eps))
+            self.z_sample_list.append(z_sample)
+            
         self.x_sample_mean_flat_list = list()
         self.x_sample_flat_list = list()
         self.x_sample_list = list()
-        for z_wy_mean_sample in self.z_wy_mean_list_sample:
-            x_sample_mean_flat = self.Px_z_graph(z_wy_mean_sample, True)
+        for i in range(self.K):
+            x_sample_mean_flat = self.Px_z_graph(self.z_sample_list[i], True)
             self.x_sample_mean_flat_list.append(x_sample_mean_flat)
             
             eps = tf.random_normal(tf.shape(x_sample_mean_flat), 0, 1, dtype=tf.float32)
@@ -337,16 +342,24 @@ class GMVAEGraph(BaseGraph):
     
     def generate_samples(self, session, x, beta=1, num_batches=5):
         feed = {self.x_batch: np.zeros(x.shape), self.beta: beta, self.drop_rate: 0. }
-        w = []
-        z = []
+        w = list()
+        z = list()
+        x = list()
         
         tensors =  [self.w_sample]
         for i in range(num_batches):
-            w_tmp = session.run(tensors, feed_dict = feed)
+            w_tmp = session.run(self.w_sample, feed_dict = feed)
             w.extend(w_tmp)
+            z_tmp = session.run(self.z_sample_list, feed_dict = feed)
+            z.extend(np.transpose(z_tmp, [1,0,2]))
+            
+            x_tmp = session.run(self.x_sample_list, feed_dict = feed)
+            x.extend(np.transpose(x_tmp, [1,0,2,3,4]))
     
+        x = np.array(x)
+        z = np.array(z)
         w = np.array(w)
-        return w
+        return x, z, w
     
     def reconstruct_input(self, session, x, beta=1):
 

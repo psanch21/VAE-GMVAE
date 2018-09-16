@@ -36,11 +36,13 @@ class BaseVisualize:
     def scatter_variable(self, var, labels, title, perplexity=10):
         f, axarr = plt.subplots(1, 1, figsize=self.fig_size)
         var_2d = self.reduce_dimensionality(var)
-        for number, color in self.colors.items():
-            axarr.scatter(x=var_2d[labels==number, 0], y=var_2d[labels==number, 1], color=color, label=str(number))
-    
-    
-        axarr.legend()
+        if(labels is not None):
+            for number, color in self.colors.items():
+                axarr.scatter(x=var_2d[labels==number, 0], y=var_2d[labels==number, 1], color=color, label=str(number))
+            axarr.legend()
+        else:
+            axarr.scatter(x=var_2d[:, 0], y=var_2d[:, 1], color=self.colors[2])            
+
         axarr.grid()
         f.suptitle(title, fontsize=20)
         return f

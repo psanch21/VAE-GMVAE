@@ -204,7 +204,7 @@ class GMVAEModel(BaseModel):
 
         return
     
-    def generate_samples(self, data):
+    def generate_samples(self, data,num_batches=20):
         with tf.Session(graph=self.graph) as session:
             saver = tf.train.Saver()
             if(self.load(session, saver)):
@@ -214,9 +214,9 @@ class GMVAEModel(BaseModel):
                 return
         
             x_batch = data.random_batch(self.batch_size)
-            x_samples,  z_samples = self.model_graph.generate_samples(session, x_batch, beta=1)
+            x_samples,  z_samples,  w_samples = self.model_graph.generate_samples(session, x_batch, beta=1, num_batches=num_batches)
             
-            return x_samples,  z_samples
+            return x_samples,  z_samples, w_samples
             
             
     def reconstruct_input(self, data):

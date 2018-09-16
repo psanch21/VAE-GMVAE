@@ -85,9 +85,9 @@ if(flags.results==1):
     from GMVAE_visualize import GMVAEVisualize
     visualize = GMVAEVisualize(config.model_name, config.results_dir, (10, 15))
        
-    # _samples, z_samples = vae_model.generate_samples(data_test)
+    x_samples, z_samples, w_samples = vae_model.generate_samples(data_test, num_batches=2)
     
-    # visualize.samples(x_samples, z_samples)
+    visualize.samples(x_samples, z_samples, w_samples)
     
     x_input, x_labels, x_recons, z_recons, w_recons, y_recons = vae_model.reconstruct_input(data_test)
     

@@ -15,28 +15,31 @@ class GMVAEVisualize(BaseVisualize):
         super().__init__(model_name, result_dir,fig_size )
 
     
-    def samples(self, x_samples, z_samples, num_samples_to_plot=5):
-        f, axarr = plt.subplots(num_samples_to_plot, num_samples_to_plot, figsize=self.fig_size)
+    def samples(self,x_samples, z_samples, w_samples, num_samples_to_plot=5):
         
-        count = 0
-        idx_vec = np.random.randint(0,x_samples.shape[0])
-        for i in range(num_samples_to_plot):
-            for j in range(num_samples_to_plot):
-                axarr[i, j].imshow(x_samples[count, :].reshape([x_samples.shape[1], x_samples.shape[2]]), cmap='gray')
-                axarr[i, j].axis('off')
-                count+=1
-                     
-        # axarr[0,0].set_title('z')
-        
-        # f.legend()
-        st = f.suptitle('Images Generated')
-        f.tight_layout()
-        st.set_y(0.98)
-        f.subplots_adjust(top=0.90)
-        self.save_img(f, 'data_generation')
+        K = x_samples.shape[1]
+        for j in range(K):
+            f = self.plot_in_grid(x_samples[:,j,:,:,:], 'Images Generated ' + str(j))
+            self.save_img(f, 'data_gen_'+str(j))
+            # f = self.scatter_variable(z_samples[:,j,:],None, 'Images Generated Z ' + str(j))
+            # self.save_img(f, 'data_gen_z_'+str(j))
         
         return 
     
+    def plot_in_grid(self, x, title, num_samples_to_plot=5 ):
+        f, axarr = plt.subplots(num_samples_to_plot, num_samples_to_plot, figsize=self.fig_size)
+        count = 0
+        idx_vec = np.random.randint(0,x.shape[0])
+        for i in range(num_samples_to_plot):
+            for j in range(num_samples_to_plot):
+                axarr[i, j].imshow(x[count, :].reshape([x.shape[1], x.shape[2]]), cmap='gray')
+                axarr[i, j].axis('off')
+                count+=1
+        st = f.suptitle(title)
+        f.tight_layout()
+        st.set_y(0.98)
+        f.subplots_adjust(top=0.90)
+        return f
     def recons(self, x_input, x_labels, x_recons, z_recons, w_recons, y_recons, num_samples_to_plot=5):
 
         f, axarr = plt.subplots(num_samples_to_plot, 3, figsize=self.fig_size)
