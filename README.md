@@ -102,13 +102,13 @@ The selection of an architecture is done through the model_type parameter. It ca
 
 ## Saved models
 
-Models are saved following the following naming. For the VAE it has 7 fields:
+Models are saved following the following naming. For the VAE it has 6 fields (+ extra):
 
 ```
 {model_type}_{dataset_name}_{sigma}_{dim_Z}_{hidden_dim}_{num_layers}
 ```
 
-For the GMVAE it has the previous field plus "dim_Z" and "K_clusters", which makes 9 in total:
+For the GMVAE it has the previous field plus "dim_Z" and "K_clusters", which makes 8 in total (+ extra):
 
 ```
 {model_type}_{dataset_name}_{sigma}_{dim_Z}_{dim_W}_{hidden_dim}_{num_layers}_{K_clusters}
