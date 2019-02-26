@@ -1,5 +1,5 @@
 # VAE-GMVAE
-This repository contains the implementation of the VAE and Gaussian Mixture VAE using TensorFlow. The VAE implementation  is completeley based on the model described in [link](https://arxiv.org/pdf/1606.05908.pdf) and the GMVAE implementation is based on the model presented in [link](https://arxiv.org/pdf/1611.02648.pdf) with some modifications in the optimization function and the implementation of some distributions. These modifications are described in the Chapter 4 of this bachelor thesis (soon available).
+This repository contains the implementation of the VAE and Gaussian Mixture VAE using TensorFlow. The VAE implementation  is completeley based on the model described in [link](https://arxiv.org/pdf/1606.05908.pdf) and the GMVAE implementation is based on the model presented in [link](https://arxiv.org/pdf/1611.02648.pdf) with some modifications in the optimization function and the implementation of some distributions. These modifications are described in the Chapter 4 of this bachelor [thesis](https://www.researchgate.net/publication/331089295_Unsupervised_Deep_Learning_Research_and_Implementation_of_Variational_Autoencoders)
 
 ## Dependencies
 1. Install [Tensorflow](https://www.tensorflow.org/get_started/os_setup)
