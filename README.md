@@ -193,3 +193,9 @@ Using FREY dataset, the labels have been manually:
 ## Acknowledgments
 - C. Doersch, “Tutorial on Variational Autoencoders,” ArXiv e-prints, Jun. 2016. arXiv: <https://arxiv.org/pdf/1606.05908.pdf>
 - N. Dilokthanakul et al., “Deep Unsupervised Clustering with Gaussian Mixture Variational Autoencoders,” ArXiv e-prints, Nov. 2016. arXiv: <https://arxiv.org/pdf/1611.02648.pdf>
+
+
+## Further information
+License for all files: [Apache License 2.0](LICENSE)
+
+If you have any question, please don't hesitate to contact me at <pablosan@ing.uc3m.es>
