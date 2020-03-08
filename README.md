@@ -35,7 +35,7 @@ For the GMVAE:
 <img width="460" src="imgs/elbo_GMVAE.png">
 </p>
 
-For a complete explanation of both models see Chapter 3 and Chapter 4 of the bachelor thesis (soon available).
+For a complete explanation of both models see Chapter 3 and Chapter 4 of the bachelor thesis.
 
 ## Hyperparameters
 The following hyperparameters are defined. Some of them handle the files
