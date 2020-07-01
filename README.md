@@ -198,4 +198,4 @@ Using FREY dataset, the labels have been manually:
 ## Further information
 License for all files: [Apache License 2.0](LICENSE)
 
-If you have any question, please don't hesitate to contact me at <pablosan@ing.uc3m.es>
+If you have any question, please don't hesitate to contact me at <psanch2103@gmail.com>
